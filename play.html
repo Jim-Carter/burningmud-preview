@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Start Playing · Burning MUD</title>
+<meta name="description" content="How to connect to Burning MUD: pick a client, connect to burningmud.com port 4000, and what to type in your first ten minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Martian+Mono:wdth,wght@112.5,700;112.5,800&display=swap">
+<style>
+/* Layout: guide column at reading width with a sticky "on this page" rail; same session world as the homepage, quieter. */
+:root{
+  color-scheme: dark;
+  --ground:#120d0b; --ground-2:#1a1310; --ground-3:#241a15;
+  --bone:#ece2d2; --dim:#b3a491; --faint:#9a8b7a; --rule:#3b2c23;
+  --cyan:#74d6db; --ember:#ff7a1a; --flame:#ffc63f; --blood:#ff5a47; --moss:#9ad66b;
+  --f-mono:"Atkinson Hyperlegible Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  --f-body:"Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --f-disp:"Martian Mono", "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --step--1:clamp(.875rem,.84rem + .15vw,.95rem);
+  --step-0:clamp(1rem,.96rem + .2vw,1.125rem);
+  --step-1:clamp(1.2rem,1.1rem + .5vw,1.45rem);
+  --step-2:clamp(1.5rem,1.25rem + 1.1vw,2.1rem);
+  --step-3:clamp(2rem,1.5rem + 2.2vw,3.2rem);
+}
+*{box-sizing:border-box}
+html{background:var(--ground);scroll-padding-top:88px}
+body{margin:0;color:var(--bone);font:400 var(--step-0)/1.65 var(--f-body);background-color:var(--ground);
+  background-image:radial-gradient(90% 40% at 85% -8%, rgba(255,122,26,.12), transparent 60%),repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .6 0 0 0 0 .4 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-font-smoothing:antialiased}
+::selection{background:var(--ember);color:var(--ground)}
+a{color:var(--cyan);text-underline-offset:.2em;text-decoration-thickness:1px}
+a:hover{color:var(--flame)}
+:focus-visible{outline:2px solid var(--flame);outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono)}
+code{font:700 .92em var(--f-mono);color:var(--flame)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(18,13,11,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;gap:24px;padding-block:12px}
+.mark{font:800 1rem/1 var(--f-disp);font-stretch:112.5%;letter-spacing:.02em;color:var(--blood);text-decoration:none;white-space:nowrap}
+.mark span{color:var(--flame)}
+.exits{font:400 var(--step--1)/1.4 var(--f-mono);color:var(--dim);display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin-left:auto}
+.exits b{color:var(--faint);font-weight:400}
+.exits a{color:var(--cyan);text-decoration:none}
+.exits a[aria-current]{color:var(--flame);text-decoration:underline}
+.btn{display:inline-flex;align-items:center;gap:.55em;font:700 var(--step--1)/1 var(--f-mono);letter-spacing:.02em;text-decoration:none;padding:.8em 1.1em;border:1px solid var(--ember);color:var(--ground);background:var(--ember);border-radius:2px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--flame);border-color:var(--flame);color:var(--ground)}
+.btn.ghost{background:transparent;color:var(--bone);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--flame);color:var(--flame)}
+@media (max-width:860px){.top .wrap{flex-wrap:wrap;row-gap:8px}.top .btn{margin-left:auto}.exits{order:3;width:100%;margin-left:0;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;padding-bottom:2px;scrollbar-width:none}.exits b{display:none}}
+
+.crumb{font:400 .82rem/1.4 var(--f-mono);color:var(--faint);padding-top:28px}
+.crumb a{color:var(--dim)}
+.head{padding-block:22px 40px;border-bottom:1px solid var(--rule)}
+.cmd{font:400 var(--step--1)/1.3 var(--f-mono);color:var(--faint);margin:0 0 14px}
+.cmd .prompt{color:var(--moss);margin-right:.6em}
+.cmd kbd{font:inherit;color:var(--flame)}
+h1{font:800 var(--step-3)/1.05 var(--f-disp);font-stretch:112.5%;letter-spacing:-.03em;margin:0 0 .4em;max-width:18ch;text-wrap:balance}
+.lede{font-size:var(--step-1);line-height:1.5;color:var(--dim);max-width:56ch;margin:0}
+
+.layout{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:clamp(28px,5vw,72px);padding-block:44px 80px}
+.toc{position:sticky;top:96px;align-self:start;font:400 .85rem/1.4 var(--f-mono)}
+.toc p{color:var(--faint);margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;font-size:.75rem}
+.toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+.toc a{display:block;padding:7px 0 7px 14px;color:var(--dim);text-decoration:none;margin-left:-1px;border-left:1px solid transparent}
+.toc a:hover{color:var(--bone)}
+.toc a.on{color:var(--flame);border-left-color:var(--flame)}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+
+.guide{max-width:46rem;min-width:0}
+.guide section{padding-bottom:56px;margin-bottom:56px;border-bottom:1px solid var(--rule)}
+.guide section:last-child{border-bottom:0;margin-bottom:0}
+h2{font:800 var(--step-2)/1.12 var(--f-disp);font-stretch:112.5%;letter-spacing:-.025em;margin:0 0 .6em;text-wrap:balance}
+h3{font:700 var(--step-1)/1.25 var(--f-body);margin:0 0 .3em}
+p{margin:0 0 1em;max-width:66ch}
+.muted{color:var(--dim)}
+
+/* connection panel */
+.conn{border:1px solid var(--rule);background:var(--ground-2);display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;align-items:stretch}
+.conn > div{padding:18px 20px;border-right:1px solid var(--rule)}
+.conn .k{display:block;font:400 .75rem/1.3 var(--f-mono);color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.conn .v{font:700 var(--step-1)/1.2 var(--f-mono);color:var(--bone);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.copy{all:unset;cursor:pointer;font:400 .75rem/1 var(--f-mono);color:var(--cyan);border:1px solid var(--rule);padding:6px 8px;border-radius:2px}
+.copy:hover{color:var(--flame);border-color:var(--flame)}
+.copy:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+.conn .go{display:flex;align-items:center;padding:18px 20px;border-right:0}
+.conn-note{font:400 .85rem/1.5 var(--f-mono);color:var(--faint);margin-top:12px}
+@media (max-width:640px){.conn{grid-template-columns:minmax(0,1fr)}.conn > div{border-right:0;border-bottom:1px solid var(--rule)}.conn .go{border-bottom:0}}
+
+/* client chooser */
+.tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--rule);margin:22px 0 0}
+.tabs button{all:unset;cursor:pointer;font:700 .9rem/1 var(--f-mono);color:var(--dim);padding:12px 16px;border:1px solid transparent;border-bottom:0;margin-bottom:-1px}
+.tabs button:hover{color:var(--bone)}
+.tabs button[aria-selected="true"]{color:var(--flame);border-color:var(--rule);background:var(--ground-2)}
+.tabs button:focus-visible{outline:2px solid var(--flame);outline-offset:-2px}
+.panel{border:1px solid var(--rule);border-top:0;background:var(--ground-2);padding:6px 20px}
+.client{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;padding:16px 0;border-bottom:1px solid var(--rule)}
+.client:last-child{border-bottom:0}
+.client h3{font-size:var(--step-0);margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tag{font:400 .72rem/1 var(--f-mono);color:var(--ground);background:var(--moss);padding:4px 6px;border-radius:2px;text-transform:uppercase;letter-spacing:.05em}
+.tag.paid{background:var(--dim)}
+.client p{grid-column:1;margin:0;color:var(--dim);font-size:var(--step--1)}
+.client a.get{grid-row:1 / span 2;grid-column:2;align-self:center;font:700 .85rem/1 var(--f-mono)}
+
+/* first ten minutes */
+.walk{list-style:none;margin:0;padding:0;counter-reset:s}
+.walk li{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:4px 16px;padding:18px 0;border-top:1px solid var(--rule);counter-increment:s}
+.walk li::before{content:counter(s,decimal-leading-zero);font:800 1rem/1.6 var(--f-disp);font-stretch:112.5%;color:var(--ember);grid-row:1 / span 2}
+.walk .type{font:700 var(--step-0)/1.5 var(--f-mono);color:var(--bone)}
+.walk .type .prompt{color:var(--moss);font-weight:400;margin-right:.5em}
+.walk p{margin:0;color:var(--dim)}
+
+/* faq */
+details{border-top:1px solid var(--rule)}
+details:last-of-type{border-bottom:1px solid var(--rule)}
+summary{cursor:pointer;list-style:none;padding:16px 0;font:700 var(--step-0)/1.4 var(--f-body);display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:700 1.1rem/1 var(--f-mono);color:var(--ember)}
+details[open] summary::after{content:"\2212"}
+details p{color:var(--dim)}
+
+.help-out{font:400 .9rem/1.6 var(--f-mono);border:1px solid var(--rule);background:var(--ground-2);padding:16px 20px;white-space:pre-wrap;color:var(--bone);margin:0 0 16px;overflow-x:auto}
+
+footer{border-top:1px solid var(--rule);padding-block:36px 56px;color:var(--dim);font-size:var(--step--1)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--flame);color:var(--ground);font:700 .9rem/1 var(--f-mono);padding:12px 16px;border-radius:2px;transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div style="background:#ffc63f;color:#120d0b;font:700 .8rem/1.4 'Atkinson Hyperlegible Mono',ui-monospace,monospace;padding-block:8px;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));text-align:center">Design preview of a new burningmud.com. Not live yet. The sample session and player names are made up.</div>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="index.html" aria-label="Burning MUD home">BURNING<span>MUD</span></a>
+    <nav class="exits" aria-label="Main">
+      <b>Obvious Exits: [</b>
+      <a href="play.html" aria-current="page">Play</a><a href="index.html#world">World</a><a href="index.html#classes">Classes</a><a href="index.html#well">The Well</a><a href="index.html#help">Help</a><a href="index.html#who">Community</a><a href="#">Builders</a>
+      <b>]</b>
+    </nav>
+    <a class="btn" href="telnet://burningmud.com:4000">Play now</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <p class="crumb"><a href="index.html">Home</a> / Play</p>
+    <div class="head">
+      <p class="cmd"><span class="prompt">&lt;20hp 100m 100mv&gt;</span><kbd>help newbie</kbd></p>
+      <h1>Start playing Burning</h1>
+      <p class="lede">Everything you need for your first night: where to connect, which program to use, and what to type once you're in.</p>
+    </div>
+
+    <div class="layout">
+      <nav class="toc" aria-label="On this page">
+        <p>On this page</p>
+        <ol>
+          <li><a href="#connect" class="on">Connect</a></li>
+          <li><a href="#clients">Pick a client</a></li>
+          <li><a href="#first">Your first ten minutes</a></li>
+          <li><a href="#faq">Common questions</a></li>
+          <li><a href="#stuck">Getting help</a></li>
+        </ol>
+      </nav>
+
+      <article class="guide">
+        <section id="connect">
+          <h2>Connect</h2>
+          <p class="muted">Burning runs on a telnet server. If you've never heard of telnet, that's fine: it's a plain-text connection, and any MUD client speaks it.</p>
+          <div class="conn">
+            <div><span class="k">Host</span><span class="v">burningmud.com <button class="copy" type="button" data-copy="burningmud.com">Copy</button></span></div>
+            <div><span class="k">Port</span><span class="v">4000 <button class="copy" type="button" data-copy="4000">Copy</button></span></div>
+            <div class="go"><a class="btn" href="telnet://burningmud.com:4000">Play now</a></div>
+          </div>
+          <p class="conn-note">At "Account name?" type <code>new</code> to create an account.</p>
+        </section>
+
+        <section id="clients">
+          <h2>Pick a client</h2>
+          <p class="muted">A client is the program you play in. Any of these will work. If you're unsure, take Mudlet.</p>
+          <div class="tabs" role="tablist" aria-label="Your device">
+            <button role="tab" id="t-desk" aria-selected="true" aria-controls="p-desk" type="button">Windows · Mac · Linux</button>
+            <button role="tab" id="t-term" aria-selected="false" aria-controls="p-term" type="button" tabindex="-1">Command line</button>
+            <button role="tab" id="t-phone" aria-selected="false" aria-controls="p-phone" type="button" tabindex="-1">Android</button>
+            <button role="tab" id="t-none" aria-selected="false" aria-controls="p-none" type="button" tabindex="-1">Nothing to install</button>
+          </div>
+          <div class="panel" role="tabpanel" id="p-desk" aria-labelledby="t-desk">
+            <div class="client"><h3>Mudlet <span class="tag">Free · Recommended</span></h3><p>Modern client for Windows, Mac and Linux. The easiest start if you've never played a MUD.</p><a class="get" href="https://www.mudlet.org/">mudlet.org</a></div>
+            <div class="client"><h3>CMUD <span class="tag paid">Paid · Windows</span></h3><p>The modern replacement for zMUD. Strong scripting; many veterans use it.</p><a class="get" href="https://www.zuggsoft.com/">zuggsoft.com</a></div>
+            <div class="client"><h3>zMUD <span class="tag paid">Paid · Windows</span></h3><p>The classic. Still works, no longer developed.</p><a class="get" href="https://www.zuggsoft.com/">zuggsoft.com</a></div>
+            <div class="client"><h3>PuTTY <span class="tag">Free · Windows</span></h3><p>A plain telnet and SSH program. Connects fine, but has no triggers.</p><a class="get" href="https://putty.org/">putty.org</a></div>
+          </div>
+          <div class="panel" role="tabpanel" id="p-term" aria-labelledby="t-term" hidden>
+            <div class="client"><h3>TinyFugue <span class="tag">Free · Linux</span></h3><p>The long-time favourite on Burning. The Uzi trigger set is built for it.</p><a class="get" href="https://tinyfugue.sourceforge.net/">sourceforge</a></div>
+            <div class="client"><h3>TinTin++ <span class="tag">Free · Linux, Windows</span></h3><p>Command-line client with scripting; WinTin++ on Windows.</p><a class="get" href="https://tintin.mudhalla.net/">tintin.mudhalla.net</a></div>
+          </div>
+          <div class="panel" role="tabpanel" id="p-phone" aria-labelledby="t-phone" hidden>
+            <div class="client"><h3>JuiceSSH <span class="tag">Free · Android</span></h3><p>Telnet and SSH client for Android. Add a telnet connection to burningmud.com, port 4000.</p><a class="get" href="https://juicessh.com/">juicessh.com</a></div>
+          </div>
+          <div class="panel" role="tabpanel" id="p-none" aria-labelledby="t-none" hidden>
+            <div class="client"><h3>Your computer's telnet <span class="tag">Built in</span></h3><p>Click Play now and your system opens its default telnet program. On Windows 10 and 11 you may need to switch the Telnet Client feature on first.</p><a class="get" href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/telnet">How to</a></div>
+          </div>
+        </section>
+
+        <section id="first">
+          <h2>Your first ten minutes</h2>
+          <p class="muted">You start in the temple of Karandras. Type these in roughly this order.</p>
+          <ol class="walk">
+            <li><span class="type"><span class="prompt">&gt;</span>look</span><p>Read the room: its description, who's here and the obvious exits.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>help</span><p>Lists every help topic by category. <code>help &lt;word&gt;</code> explains any command.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>look in chest</span><p>The donation chest near the temple holds gear other players gave away. A better weapon makes the biggest difference early.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>identify &lt;item&gt;</span><p>Learn what an item does. Scrolls of identification are sold at the magic shop.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>gossip hi, I'm new</span><p>The public channel. Ask where to level, what to wear, where the shops are.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>areas 1-10</span><p>Zones suited to levels 1 to 10. The cartographer in each Temple City sells maps of the area.</p></li>
+            <li><span class="type"><span class="prompt">&gt;</span>recall</span><p>Lost, or in the dark? Recall takes you back to your temple.</p></li>
+          </ol>
+        </section>
+
+        <section id="faq">
+          <h2>Common questions</h2>
+          <details open><summary>Is it really free?</summary><p>Yes. Burning runs under the Diku licence, which means it can't charge players, and it never has. Staff volunteer their time.</p></details>
+          <details><summary>My character can't see. It's too dark.</summary><p>Some races, like dwarves, have darkvision. Humans don't. Carry a light, learn the darkvision spell if your class has it, or type <code>recall</code> to get back to the temple.</p></details>
+          <details><summary>Are there quests?</summary><p>Questmasters around the world run dozens of automatic quests with unique rewards. Immortals also host live events: hide and seek, arena battles, and big fights against new threats.</p></details>
+          <details><summary>Is there a way to win?</summary><p>No. You set your own goals. Some players chase gear, some explore every area, some lead raids.</p></details>
+          <details><summary>Will my character be deleted if I stop playing?</summary><p>No. Characters and equipment are kept. Come back whenever you like.</p></details>
+        </section>
+
+        <section id="stuck">
+          <h2>Getting help</h2>
+          <pre class="help-out"><span style="color:var(--moss)">&gt;</span> who
+<span style="color:var(--ember)">[IMP]</span> Bane         <span style="color:var(--faint)">(an immortal is online)</span></pre>
+          <p class="muted">Type <code>who</code> to see if an immortal is on, and send them a tell. No immortal online? Pray at the altar in any temple; your prayer is delivered when one logs in. Or email <span class="mono">support@burningmud.com</span>.</p>
+          <a class="btn" href="telnet://burningmud.com:4000">Play now</a>
+        </section>
+      </article>
+    </div>
+  </div>
+</main>
+<footer><div class="wrap"><span>Burning MUD · online since 1 January 1996 · burningmud.com port 4000</span><span><a href="index.html">Home</a> · <a href="#">Maps</a> · <a href="#">Builders' docs</a> · <a href="#">Vote</a></span></div></footer>
+<div class="toast" role="status" id="toast"></div>
+<script>
+(function(){
+  var toast=document.getElementById('toast'),tt;
+  function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on')},1800)}
+  document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){var v=b.dataset.copy;try{navigator.clipboard.writeText(v).then(function(){say('Copied: '+v)},function(){say(v)})}catch(e){say(v)}})});
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
+  function sel(t){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on});t.focus()}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(t)});t.addEventListener('keydown',function(e){if(e.key==='ArrowRight')sel(tabs[(i+1)%tabs.length]);if(e.key==='ArrowLeft')sel(tabs[(i-1+tabs.length)%tabs.length])})});
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id)})}})},{rootMargin:'-30% 0px -60% 0px'});document.querySelectorAll('.guide section').forEach(function(s){io.observe(s)})}
+})();
+</script>
+</body>
+</html>

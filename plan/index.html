@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Burning MUD Redesign Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Martian+Mono:wdth,wght@112.5,800&display=swap">
+<style>
+/* Layout: a single reading column with a sticky contents rail; findings as ruled tables, comps as framed screenshots that link to the live HTML. Same world as the comps, dialled down for reading. */
+:root{
+  color-scheme:dark;
+  --ground:#120d0b; --ground-2:#1a1310; --bone:#ece2d2; --dim:#b3a491; --faint:#9a8b7a; --rule:#3b2c23;
+  --cyan:#74d6db; --ember:#ff7a1a; --flame:#ffc63f; --blood:#ff5a47; --moss:#9ad66b;
+  --f-mono:"Atkinson Hyperlegible Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-body:"Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --f-disp:"Martian Mono", "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--ground);color:var(--bone);font:400 1.0625rem/1.65 var(--f-body);
+  background-image:radial-gradient(90% 30% at 10% -5%, rgba(255,122,26,.13), transparent 60%),repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px);-webkit-font-smoothing:antialiased}
+::selection{background:var(--ember);color:var(--ground)}
+a{color:var(--cyan);text-underline-offset:.2em}
+a:hover{color:var(--flame)}
+:focus-visible{outline:2px solid var(--flame);outline-offset:3px}
+code,.mono{font-family:var(--f-mono)}
+code{font-size:.9em;color:var(--flame)}
+.page{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));padding-block:40px 80px;display:grid;grid-template-columns:12.5rem minmax(0,1fr);gap:56px}
+.rail{position:sticky;top:24px;align-self:start;font:400 .85rem/1.4 var(--f-mono)}
+.rail p{color:var(--faint);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;margin:0 0 10px}
+.rail ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+.rail a{display:block;padding:6px 0 6px 14px;color:var(--dim);text-decoration:none}
+.rail a:hover{color:var(--flame)}
+@media (max-width:900px){.page{grid-template-columns:minmax(0,1fr)}.rail{display:none}}
+main{min-width:0;max-width:52rem}
+.eyebrow{font:400 .85rem/1.3 var(--f-mono);color:var(--faint);margin:0 0 12px}
+.eyebrow .p{color:var(--moss);margin-right:.6em}
+.eyebrow kbd{font:inherit;color:var(--flame)}
+h1{font:800 clamp(2rem,1.4rem + 2.6vw,3.3rem)/1.05 var(--f-disp);font-stretch:112.5%;letter-spacing:-.03em;margin:0 0 .4em;text-wrap:balance}
+h2{font:800 clamp(1.45rem,1.2rem + 1vw,2rem)/1.15 var(--f-disp);font-stretch:112.5%;letter-spacing:-.025em;margin:0 0 .7em;text-wrap:balance}
+h3{font:700 1.2rem/1.3 var(--f-body);margin:1.6em 0 .5em}
+p,li{max-width:68ch}
+.lede{font-size:1.25rem;line-height:1.5;color:var(--dim)}
+section{padding-block:52px;border-top:1px solid var(--rule)}
+.muted{color:var(--dim)}
+.verdict{border:1px solid var(--rule);background:var(--ground-2);padding:18px 22px;margin:24px 0}
+.verdict ul{margin:.4em 0 0;padding-left:1.1em}
+.verdict li{margin:.25em 0}
+.tbl{overflow-x:auto;margin:16px 0 8px}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:10px 12px 10px 0;border-bottom:1px solid var(--rule)}
+th{font:700 .75rem/1.3 var(--f-mono);color:var(--faint);text-transform:uppercase;letter-spacing:.06em;border-bottom-color:var(--faint)}
+td:first-child{white-space:nowrap;font-family:var(--f-mono);color:var(--bone);font-size:.88rem}
+td{color:var(--dim)}
+.bad{color:var(--blood);font-weight:700}
+.ok{color:var(--moss);font-weight:700}
+.shot{margin:22px 0 30px}
+.shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+.shot figcaption{font:400 .82rem/1.5 var(--f-mono);color:var(--faint);margin-top:8px}
+.pair{display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:640px){.pair{grid-template-columns:minmax(0,1fr)}}
+.open{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 0}
+.btn{display:inline-flex;align-items:center;font:700 .9rem/1 var(--f-mono);text-decoration:none;padding:.75em 1em;border:1px solid var(--ember);background:var(--ember);color:var(--ground);border-radius:2px}
+.btn:hover{background:var(--flame);border-color:var(--flame);color:var(--ground)}
+.btn.ghost{background:transparent;color:var(--bone);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--flame);color:var(--flame)}
+.sitemap{font:400 .92rem/1.75 var(--f-mono);border:1px solid var(--rule);background:var(--ground-2);padding:18px 22px;white-space:pre;overflow-x:auto;margin:16px 0}
+.sitemap b{color:var(--flame);font-weight:700}
+.sitemap i{color:var(--faint);font-style:normal}
+.swatches{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule);margin:16px 0}
+.swatches div{flex:1 1 6.5rem;padding:12px;border-right:1px solid var(--rule);font:400 .78rem/1.4 var(--f-mono);color:var(--dim)}
+.swatches div:last-child{border-right:0}
+.swatches span{display:block;height:36px;margin-bottom:8px;border:1px solid rgba(255,255,255,.08)}
+.phase{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:4px 20px;padding:16px 0;border-bottom:1px solid var(--rule)}
+.phase b{font:800 1rem/1.5 var(--f-disp);font-stretch:112.5%;color:var(--ember)}
+.phase h3{margin:0 0 .3em;font-size:1.05rem}
+.phase p{margin:0;color:var(--dim)}
+@media (max-width:560px){.phase{grid-template-columns:minmax(0,1fr)}}
+ol.q{padding-left:1.3em}
+ol.q li{margin:.7em 0;color:var(--dim)}
+ol.q li strong{color:var(--bone)}
+.small{font-size:.9rem}
+</style>
+</head>
+<body>
+
+
+<div class="page">
+  <nav class="rail" aria-label="Contents">
+    <p>Contents</p>
+    <ol>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#live">Live site review</a></li>
+      <li><a href="#archive">Archive history</a></li>
+      <li><a href="#code">The code</a></li>
+      <li><a href="#positioning">Positioning</a></li>
+      <li><a href="#ia">Sitemap</a></li>
+      <li><a href="#content">Content plan</a></li>
+      <li><a href="#visual">Visual direction</a></li>
+      <li><a href="#comps">Comps</a></li>
+      <li><a href="#stack">Stack and hosting</a></li>
+      <li><a href="#targets">SEO and speed</a></li>
+      <li><a href="#phases">Build plan</a></li>
+      <li><a href="#questions">Questions for you</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <p class="eyebrow"><span class="p">&lt;412hp 230m 160mv&gt;</span><kbd>redesign burningmud.com</kbd></p>
+    <h1>A new website for Burning MUD</h1>
+    <p class="lede">Findings from the live site, thirty years of archive.org captures, today's code and a 2008 server backup, then a plan and two high-fidelity comps for a site that gets new players connected.</p>
+    <p class="muted small">Prepared 27 October 2026 as a proposal for Bane, who maintains the current site. Nothing on the live site, DNS or hosting was changed.</p>
+
+    <section id="summary">
+      <h2>Summary</h2>
+      <div class="verdict">
+        <strong>What Burning is:</strong> a free text-based multiplayer fantasy game (a MUD), running continuously since 1 January 1996 from a DikuMUD lineage that goes back to about 1990. The game is live right now at <code>burningmud.com</code> port <code>4000</code>.
+        <ul>
+          <li>The current site has good raw material: real feature copy, a new-player FAQ, a client list, Stryder's continent maps, builders' docs and a mirror of a beloved player site.</li>
+          <li>It does a poor job of turning a visitor into a player. The homepage is an ASCII logo, a typing animation and one button. Several internal links are broken. The site can't be zoomed on a phone. Every page loads a 2 MB background image.</li>
+          <li>The domain setup works against search: burningmud.com redirects to <code>burningmud.github.io</code>, so the brand domain never ranks.</li>
+          <li>The recommendation: rebuild in Astro on the same GitHub repo and free hosting. Lead with what playing actually looks like (an annotated session) and put a working Connect action on every page. Bring back the 2006 class and race pages.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="live">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>look</kbd></p>
+      <h2>Live site review</h2>
+      <p class="muted">I crawled every page reachable from the navigation and checked every link (247 references). The live site is a Jekyll build of the <code>main</code> branch, served by GitHub Pages.</p>
+      <h3>How the domains route today</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Address</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>burningmud.com</td><td>An nginx on the game server (AWS, Ireland) returns a 301 to <code>burningmud.github.io</code>. The same host answers telnet on port 4000.</td></tr>
+          <tr><td>www.burningmud.com</td><td>A Cloudflare 301 to <code>burningmud.org</code>.</td></tr>
+          <tr><td>burningmud.org</td><td>Cloudflare-proxied copy of the GitHub Pages site (200).</td></tr>
+          <tr><td>burningmud.com:4000</td><td class="ok">Live. The 1996 login banner with the implementors Stile, Bane, Blase and Stryder.</td></tr>
+          <tr><td>Mail</td><td>Google Workspace (MX on aspmx.l.google.com).</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Pages</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Page</th><th>Content</th><th>Works / fails</th></tr></thead>
+        <tbody>
+          <tr><td>/</td><td>ASCII logo loaded by fetch(), a four-line typewriter poem ("Out of the burning ashes…"), a glowing green PLAY button, a "Vote" link.</td><td>No explanation of what the game is. The poem is empty until the script types it, so screen readers and crawlers miss it.</td></tr>
+          <tr><td>/play</td><td>Telnet link, client list (Mudlet, zMUD, CMUD, PuTTY, TinyFugue, TinTin++, JuiceSSH), Windows telnet help.</td><td>Best page on the site. The Community link is wrong (<code>/community.markdown</code>).</td></tr>
+          <tr><td>/about</td><td>Data-driven accordion: pitch, "What is a MUD?", why play, features.</td><td>The strongest copy is hidden in collapsed panels. It has its own &lt;head&gt; and &lt;body&gt; inside the page body.</td></tr>
+          <tr><td>/help</td><td>Support info and a thorough new-player FAQ.</td><td class="bad">Two links to <code>/player_sites.markdown</code> return 404.</td></tr>
+          <tr><td>/maps/</td><td>Links to the Orhan and Ashinara maps and the Karandras city maps.</td><td>Maps open as raw image files. The page spells it "Ohran" while the map itself says "Orhan".</td></tr>
+          <tr><td>/community</td><td>Player sites (Cindy, Ozrak, Moe), the Cindy mirror, trigger sets (Uzi, DSPublic).</td><td>All external links answer 200.</td></tr>
+          <tr><td>/documentation</td><td>OLC intro, links to the OLC reference and the mobprogs docs.</td><td class="bad">The "build a zone" form is a goo.gl link, and goo.gl now returns 404.</td></tr>
+          <tr><td>/vote.html</td><td>The MUD Connector and MUD Verse vote buttons.</td><td>Works. MUD Verse is plain http.</td></tr>
+          <tr><td>404</td><td>"Dead End… a dark and unadorned room."</td><td>Nice in-world copy; keep it.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Brand, look and tech</h3>
+      <ul class="muted">
+        <li><strong>Marks:</strong> the ASCII "BURNING" logo from the telnet banner; "Obvious Exits: [ … ]" as the nav label; the "burning ashes" tagline (in use since 2006).</li>
+        <li><strong>Look:</strong> the jekyll-theme-midnight theme with the Orhan map behind a 70% black overlay, Inconsolata, darkorange headings and #8b0000 text. That dark red on near-black is about 1.9:1 contrast.</li>
+        <li><strong>Tech:</strong> Jekyll 3.10, jQuery 1.12.4 (2016), respond.js and IE 8 shims, and jekyll-feed producing an empty feed.</li>
+        <li><strong>Mobile:</strong> <code>user-scalable=no</code> blocks pinch zoom, which fails WCAG 1.4.4. The nav is one long centred line, and the terminal block is fixed at 50% width.</li>
+        <li><strong>Speed:</strong> the HTML is only about 8 KB, but every page pulls the 1.99 MB Orhan JPEG as its background, plus jQuery and a Google Font.</li>
+        <li><strong>SEO:</strong> the canonical URL is written as <code>burningmud.github.io/</code> with no scheme, which makes it a relative URL. Every page has the same description ("Burning MUD Homepage"). There's no robots.txt, sitemap or favicon. Links end in <code>.markdown</code> and resolve to 404s.</li>
+        <li><strong>Accessibility:</strong> the nav sits in an invalid <code>&lt;h7&gt;</code>, the about panels are buttons with no expanded state, and images lack alt text.</li>
+      </ul>
+    </section>
+
+    <section id="archive">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>history</kbd></p>
+      <h2>Thirty years on archive.org</h2>
+      <p class="muted">The Wayback CDX API lists 435 unique captures for burningmud.org (2002–2022) and 207 for burningmud.com (2002–2025). I pulled 42 representative captures. The archive rate-limited me partway through, so the class, race and spell sub-pages were sampled, not read in full.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Years</th><th>Site</th><th>Brand and message</th></tr></thead>
+        <tbody>
+          <tr><td>2002–05</td><td>Frames site on burningmud.org, hosted at a Swedish university</td><td>Big ASCII art. Pages for classes, races, per-class spells, gods, areas, a newbie guide and the multiclass guide (16 combinations then). Telnet set up through Netscape preferences.</td></tr>
+          <tr><td>2006–08</td><td>PHP and MySQL rebuild</td><td>Nav: News, Races, Classes, Features, Help files, Play, Who's playing, Highscore, Immortals, Boards, Log in. The tagline arrives. FAQ: "we focus on hack'n'slash fun with a welcoming community feel." A roster of 30-odd immortals by department.</td></tr>
+          <tr><td>2008</td><td>Same site, moves to burningmud.com</td><td>The .org registration lapsed and a squatter took it. burningmud.com became home.</td></tr>
+          <tr><td>2010–11</td><td>Google Sites stopgap</td><td>Server-move notices signed by Blase: "We ARE UP!"</td></tr>
+          <tr><td>2013</td><td>phpBB3 forum</td><td>The forum outlived the site, briefly.</td></tr>
+          <tr><td>2015–18</td><td>One-page static site</td><td>"obvious exits; [ BurningMud | how to | about ]". The 2018 About copy is the ancestor of today's.</td></tr>
+          <tr><td>2022–26</td><td>GitHub Pages (current)</td><td>Jekyll, the typewriter homepage, docs and the Cindy mirror.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Worth bringing back</h3>
+      <ul class="muted">
+        <li><strong>Class and race pages (2006):</strong> each class had flavour text and a level-by-level skill and spell table, and each race had stat modifiers (Troll: Str +2, Dex −3). This is the deepest content Burning ever had on the web, and new players want it.</li>
+        <li><strong>The 2006 features list:</strong> auction, item store, navigators, guides, spirits, altars, hunting, arena, Temple Cities, meta shop, room spells. It's a ready-made "what's in the game" index.</li>
+        <li><strong>Who's playing and high scores:</strong> these were live from the game database in 2006. This is the strongest proof of life a MUD site can show.</li>
+        <li><strong>The immortal roster by department:</strong> builders, coders, player relations, questing, balance. It shows real people run the place.</li>
+        <li><strong>News:</strong> even a short changelog answers "is this still alive?"</li>
+      </ul>
+    </section>
+
+    <section id="code">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>stat repo</kbd></p>
+      <h2>The code</h2>
+      <p class="muted">Two sources: the public GitHub repo that holds today's site, and a full server backup from 30 December 2008 that Jim kept. From the backup I read only the website files and the game's text files; the player and forum databases stay offline.</p>
+      <h3>The 2008 server backup</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Archive</th><th>What's in it</th></tr></thead>
+        <tbody>
+          <tr><td>web-1.tar.gz</td><td>The 2006–08 PHP site by Moralis (2,843 files), with a phpBB board, the Cindy and Moe player pages, CSS and the original <code>BURNING.jpg</code> and <code>logo-1.gif</code>. The PHP itself builds SQL from raw query strings, so revive ideas from it, not code.</td></tr>
+          <tr><td>Burning-20081228.tar.gz</td><td>The game as checked out from SVN: <code>src/</code> (C source and about 40 utilities such as <code>showcombo.c</code>, <code>topquests.c</code>, <code>sqlimportpfile.c</code>) and <code>lib/</code> (help, news, MOTD, credits, socials, guides, world files).</td></tr>
+          <tr><td>svn dumps, repos</td><td>Full Subversion history (two dumps, about 44 MB).</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Ideas worth mining</h3>
+      <ul class="muted">
+        <li><strong>The real colour convention.</strong> The game's own text writes the name as <code>&amp;+rBurning &amp;+yMUD</code>: Burning in red, MUD in yellow, commands in yellow. The comps' wordmark now follows it.</li>
+        <li><strong>501 help entries</strong> (<code>lib/text/help_table</code>, 12,452 lines). They can feed a searchable web help browser that stays in sync with the game, which Moralis listed as "Helpfile browser / search / autolink" in his TODO.</li>
+        <li><strong>A half-built player site.</strong> The 2006 TODO marks these as built but untested: account login, web mudmail, whois lookups, character and email privacy toggles, mercenary visibility, online page editing, and a typo/idea/bug tracker fed from the game. Still on the idea list: a voting interface, monthly polls, the "Official BurningMUD Times" and a redesign.</li>
+        <li><strong>Live data, already modelled.</strong> "Who's online" read a <code>who2html</code> table. High scores ranked level, reputation, deaths, K'ta'viir stats trained, quests completed and character age, filterable by class. News lived in a <code>newsItems</code> table with an RSS generator. A small nightly JSON export of the same data would give the static site its proof of life.</li>
+        <li><strong>New-player features to check.</strong> In 2008 every new character got a spirit guide until level 7 (<code>ask spirit tour</code>), plus an Elder channel for questions (<code>etell</code>). If these still exist they belong on the Play page.</li>
+        <li><strong>Credits.</strong> <code>lib/text/credits</code> lists the DIKU authors and every Burning builder and coder since 1996, which is ready-made content for an About page.</li>
+      </ul>
+      <h3>Today's site on GitHub</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Item</th><th>Finding</th></tr></thead>
+        <tbody>
+          <tr><td>Repo</td><td><code>BurningMUD/burningmud.github.io</code>, the only repo in the BurningMUD org. 397 commits on <code>main</code>, nearly all by Bane (Dec 2022 to May 2024), plus one update on 30 Apr 2026.</td></tr>
+          <tr><td>Branches</td><td>Pages builds <code>main</code>. The default branch is <code>master</code>, which holds one "test page" commit. <code>dev-001</code> has an unmerged Play page rewrite, map updates and a renamed community page.</td></tr>
+          <tr><td>Content model</td><td><code>_data/about_topics.yaml</code> drives the About accordion. Carry the pattern over as Astro content collections.</td></tr>
+          <tr><td>Docs</td><td>Thorough mobprog (63 KB) and OLC references in Markdown.</td></tr>
+          <tr><td>Clutter</td><td>A committed vim swap file, the default Jekyll post, a 2.4 MB Ashinara JPEG served at full size, an unused AI-looking river illustration, and directory indexes saved eight times over in the Cindy mirror.</td></tr>
+        </tbody>
+      </table></div>
+</section>
+
+    <section id="positioning">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>score</kbd></p>
+      <h2>Positioning and audience</h2>
+      <p><strong>Primary audience:</strong> people who have never played Burning (Jim's call). They arrive from MUD listing sites, search or a friend, and give the page under a minute. Many have never installed a MUD client.</p>
+      <p><strong>One line:</strong> a free fantasy world made of words, open since 1996, built for big cooperative fights.</p>
+      <p class="muted">What no other MUD can honestly claim: the 1996 login screen that's still running; 64 dual-class pairs; the Well, 20 procedurally generated levels that change daily and drop essence that changes your race; raids of 50; two continents and 400+ areas; characters never deleted.</p>
+      <p class="muted"><strong>Secondary audiences, one click deep:</strong> current players (maps, help, community tools), lapsed players from the 2000s checking whether it's still up, and builders (OLC and mobprog docs).</p>
+    </section>
+
+    <section id="ia">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>exits</kbd></p>
+      <h2>Information architecture</h2>
+      <p class="muted">Seven top-level exits. The nav keeps the "Obvious Exits" label. A Play button is fixed in the header on every page.</p>
+<pre class="sitemap"><b>/</b>                    Home: annotated session, what a MUD is, world, classes, the Well, community, connect
+<b>/play</b>                Start playing: connect, pick a client, your first ten minutes, FAQ, getting help
+<b>/world</b>               Orhan and Ashinara maps (zoomable), Temple Cities, area index
+  /world/karandras     The starting city, both sides of the in-game map
+<b>/classes</b>             The 8 classes and the 8 × 8 dual-class matrix   <i>← restored from 2006</i>
+  /classes/[class]     Flavour, skill and spell table by level           <i>← restored</i>
+<b>/races</b>               12 races with stat modifiers                     <i>← restored</i>
+<b>/well</b>                How the Well works, essence and race change
+<b>/help</b>                FAQ, in-game help categories, support
+<b>/community</b>           Player sites, trigger sets, the Cindy archive, vote
+  /community/staff     Immortals by department                           <i>← restored</i>
+  /archive/cindy/…     The mirror, unchanged URLs
+<b>/builders</b>            OLC guide, command reference, mobprogs, apply to build
+<b>/news</b>                Short changelog and event notices (Markdown files)
+<b>/404</b>                 "Dead End. You have entered a dark and unadorned room."</pre>
+      <p class="muted small">Redirects: every old <code>.markdown</code>, <code>.html</code> and <code>player_sites</code> URL goes to its new home, so nothing in old forum posts or MUD lists dies.</p>
+    </section>
+
+    <section id="content">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>inventory</kbd></p>
+      <h2>Content: keep, rewrite, cut</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Do</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td class="ok">Keep</td><td>The feature copy from about_topics.yaml, the FAQ in help.markdown, the client list, OLC and mobprog docs, the 404 copy, the "Obvious Exits" nav, the tagline (moved off the homepage into About), Stryder's maps, the Cindy mirror.</td></tr>
+          <tr><td style="color:var(--flame)">Rewrite</td><td>The homepage (it explains nothing today). About, out of accordions into a plain readable page. The Help FAQ, split into a new-player guide (/play) and a reference (/help). Maps, into a zoomable viewer with alt text. Every page title and description.</td></tr>
+          <tr><td style="color:var(--flame)">Restore</td><td>Class, race, features and staff pages from the 2006 site, checked against the game today.</td></tr>
+          <tr><td class="bad">Cut</td><td>The typewriter effect, jQuery and IE shims, the Jekyll welcome post, the swap file, the unused river illustration, the dead goo.gl form link (replace with an email or a GitHub issue form), the eight duplicate directory indexes in the mirror.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="visual">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>look self</kbd></p>
+      <h2>Visual direction: a live session, annotated</h2>
+      <p>The page is a play session. The homepage opens with the real 1996 login banner, a room, a fight and the prompt line. Margin notes explain each line to a newcomer: "This is a room." "That's your prompt." Every section opens with the command that would print it (<code>help mud</code>, <code>areas</code>, <code>enter well</code>). This shows a stranger what playing looks like in the first ten seconds, and it avoids both the painted-fantasy MMO page and the green-on-black hacker terminal.</p>
+      
+      <h3>Colour: the ANSI roles a MUD client really shows</h3>
+      <div class="swatches">
+        <div><span style="background:#120d0b"></span>Ember black<br>ground</div>
+        <div><span style="background:#ece2d2"></span>Bone<br>descriptions</div>
+        <div><span style="background:#74d6db"></span>Cyan<br>rooms, exits, links</div>
+        <div><span style="background:#ff7a1a"></span>Ember<br>Burning, actions</div>
+        <div><span style="background:#ffc63f"></span>Flame<br>gossip, focus</div>
+        <div><span style="background:#ff5a47"></span>Blood<br>damage</div>
+        <div><span style="background:#9ad66b"></span>Moss<br>prompt, heals</div>
+      </div>
+      <h3>Type, grid, imagery, motion</h3>
+      <ul class="muted">
+        <li><strong>Type:</strong> Atkinson Hyperlegible Mono for game output, Atkinson Hyperlegible Next for plain explanation, Martian Mono (wide, heavy) for headlines. The Atkinson faces were drawn for low-vision readers, which matters for an audience that includes many screen-reader and magnifier users.</li>
+        <li><strong>Grid:</strong> a session column about 46 rem wide with a 17 rem notes rail; sections on a 1240 px frame; box-drawing rules instead of rounded cards.</li>
+        <li><strong>Texture:</strong> a faint scanline and warm noise over the ground, plus an ember glow at the top of the page (Jim's page floor).</li>
+        <li><strong>Imagery:</strong> Stryder's continent maps are the only illustrations. Shade characters (░▒▓█) draw the Well's depth chart. No stock fantasy art.</li>
+        <li><strong>Motion:</strong> one blinking caret on the command line, and notes that light their line on hover or focus. All of it is off under reduced motion, and nothing is hidden waiting for an animation.</li>
+      </ul>
+    </section>
+
+    <section id="comps">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>show comps</kbd></p>
+      <h2>Comps</h2>
+      <p class="muted">Both comps are working HTML: tabs, copy buttons and the class matrix all respond. They were rendered at 1440 and 390 px wide with no horizontal scroll, and both passed Impeccable's detector after contrast fixes. Session text and player names in the comp are made up and labelled as such.</p>
+      <div class="open"><a class="btn" href="../index.html">Open homepage comp</a><a class="btn ghost" href="../play.html">Open Play page comp</a></div>
+
+      <h3>Homepage</h3>
+      <div class="pair">
+        <figure class="shot"><img src="shots/home-desktop.jpg" width="1440" height="900" alt="Homepage at desktop width: headline 'A whole fantasy world, made of words', Play now and copy-address buttons, the top of the session with the burning ASCII logo."><figcaption>Desktop, first viewport</figcaption></figure>
+        <figure class="shot"><img src="shots/home-phone.jpg" width="390" height="844" alt="Homepage at phone width with the headline, Play now button and address."><figcaption>Phone</figcaption></figure>
+      </div>
+      <div class="pair">
+        <figure class="shot"><img src="shots/home-desktop-session.jpg" width="1440" height="1160" alt="The annotated session: the Temple of Karandras, exits, donation chest, gossip and a fight, with notes in the right margin and a connect command line."><figcaption>The annotated session, with notes beside the lines they explain</figcaption></figure>
+        <figure class="shot"><img src="shots/home-phone-session.jpg" width="390" height="844" alt="On phones the notes drop in under each line as boxed callouts."><figcaption>Phone: notes become callouts</figcaption></figure>
+      </div>
+      <figure class="shot"><img src="shots/home-desktop-classes.jpg" width="1440" height="1000" alt="The 8 by 8 dual-class matrix with Rogue/Magician selected and its description beside it, then the start of the Well section's depth chart."><figcaption>The dual-class matrix and the Well's depth chart</figcaption></figure>
+
+      <h3>Inner page: Start playing</h3>
+      <div class="pair">
+        <figure class="shot"><img src="shots/play-desktop.jpg" width="1440" height="900" alt="Start playing page at desktop width: breadcrumb, title, contents rail, connection panel with host, port and Play now."><figcaption>Desktop</figcaption></figure>
+        <figure class="shot"><img src="shots/play-phone.jpg" width="390" height="844" alt="Start playing page at phone width with the stacked connection panel."><figcaption>Phone</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="stack">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>stat host</kbd></p>
+      <h2>Stack and hosting</h2>
+      <ul class="muted">
+        <li><strong>Astro, static output, on GitHub Pages from the same repo</strong> (Jim's pick, open to your view). Content stays in Markdown and YAML, so Bane's docs and data files move over almost unchanged. It ships zero JavaScript by default, with small islands for the class matrix, tabs and map zoom. A GitHub Action builds and deploys on every push to <code>main</code>.</li>
+        <li><strong>Canonical domain: <code>www.burningmud.com</code>.</strong> The apex has to stay on the game server, because players telnet to burningmud.com:4000 and an HTTP proxy can't carry that. So point <code>www</code> at GitHub Pages (custom domain with HTTPS), change the apex nginx 301 to <code>https://www.burningmud.com</code>, and send burningmud.org there too. One canonical address, and the brand domain finally ranks.</li>
+        <li><strong>Cost:</strong> hosting $0 (GitHub Pages). Domains run about $10–11 a year each at Cloudflare's at-cost pricing, for .com, .org and .net. The game server's AWS bill is separate and unknown to me.</li>
+        <li><strong>Later, optional:</strong> a play-in-browser client and a live player count. Both need a small service on the game server (a websocket-to-telnet bridge, and a JSON "who" export), so they're for the game team to decide.</li>
+      </ul>
+    </section>
+
+    <section id="targets">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>score site</kbd></p>
+      <h2>SEO, performance and accessibility targets</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Area</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>Weight</td><td>Under 150 KB on the homepage before the map image. Maps lazy-loaded as AVIF/WebP at 1400 px with the full-size file a click away (today: 2 MB on every page).</td></tr>
+          <tr><td>Core Web Vitals</td><td>LCP under 1.5 s on 4G, CLS under 0.05, INP under 100 ms. Lighthouse 95+ in all four categories.</td></tr>
+          <tr><td>Search</td><td>A unique title and description per page; canonical <code>https://www.burningmud.com/…</code>; sitemap.xml and robots.txt; Open Graph image drawn from the ASCII logo; <code>VideoGame</code> JSON-LD with genre, free price and the play URL; 301s for every old URL.</td></tr>
+          <tr><td>Phrases</td><td>"free MUD", "text MMO", "DikuMUD", "fantasy MUD since 1996", "MUD for beginners", plus class and area names.</td></tr>
+          <tr><td>Accessibility</td><td>WCAG 2.2 AA: zoom allowed, 4.5:1 text contrast (the comps' faint grey was raised to 5.8:1), keyboard tabs and matrix, visible focus, real headings, alt text on maps, reduced-motion respected, no content behind animation.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="phases">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>quest list</kbd></p>
+      <h2>Build plan</h2>
+      <div class="phase"><b>Now</b><div><h3>Quick fixes on the current site</h3><p>Fix the <code>.markdown</code> and <code>player_sites</code> links, remove <code>user-scalable=no</code>, fix the canonical URL, add a favicon, replace the goo.gl link, switch the default branch to <code>main</code>, delete the swap file. About an hour of Bane's time, and it helps right away.</p></div></div>
+      <div class="phase"><b>Phase 1</b><div><h3>Foundation, Home and Play</h3><p>Astro scaffold, design tokens, header and footer, the homepage and Play page from these comps, a GitHub Actions deploy, redirects. Ship it in place of the current home and play pages.</p></div></div>
+      <div class="phase"><b>Phase 2</b><div><h3>Move existing content</h3><p>About, Help, Maps (zoom viewer), Community, Builders docs and the Cindy archive at stable URLs. Then switch the canonical domain to www.burningmud.com.</p></div></div>
+      <div class="phase"><b>Phase 3</b><div><h3>Restore the deep pages</h3><p>Classes, races, the dual-class matrix, features, staff and news, rebuilt from the 2006 pages and checked against the game.</p></div></div>
+      <div class="phase"><b>Phase 4</b><div><h3>Proof of life (optional)</h3><p>A live "who's online" count and a browser play client, if the game team adds the small services they need on the game server.</p></div></div>
+    </section>
+
+    <section id="questions">
+      <p class="eyebrow"><span class="p">&gt;</span><kbd>tell jim</kbd></p>
+      <h2>Questions for you, Bane</h2>
+      <ol class="q">
+        <li><strong>Do you like it?</strong> The direction, the homepage, the Start playing page. What would you change?</li>
+        <li><strong>Astro or Jekyll?</strong> The plan assumes you'd build it in your repo with Astro. Would you rather keep Jekyll and take only the design?</li>
+        <li><strong>Facts to confirm.</strong> Are there still 8 classes, called "Magician" (as in the 2008 code) or "Mage"? Do new players still get a spirit guide and the Elder channel? Is the race list the same 12 as in 2006? Are the Well numbers (20 levels, 6,000+ rooms, daily reshaping) still true? Which staff should be listed publicly?</li>
+        <li><strong>Domain.</strong> The plan suggests <code>www.burningmud.com</code> for the site, with the bare domain staying on the game server for port 4000, and burningmud.org redirecting. Does that work for you?</li>
+        <li><strong>Content.</strong> Could the staff supply a real (anonymised) session log to replace the made-up one, a short news history, and current class and race tables?</li>
+        <li><strong>Live data.</strong> Would the game team export a nightly JSON of who's online, high scores, news and the help table, or add a websocket bridge so people can play in the browser?</li>
+        <li><strong>Analytics.</strong> Cookie-free Cloudflare Web Analytics, or no tracking at all?</li>
+      </ol>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>
